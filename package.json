@@ -1,0 +1,72 @@
+{
+  "name": "vs-flashbang",
+  "displayName": "Flashbang",
+  "description": "Randomly deploy a flashbang in your editor",
+  "version": "0.0.1",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/NullSeile/vs-flashbang.git"
+  },
+  "publisher": "nullptr",
+  "engines": {
+    "vscode": "^1.94.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "vs-flashbang.deploy",
+        "title": "Deploy Flashbang"
+      }
+    ],
+    "configuration": {
+      "title": "Flashbang",
+      "properties": {
+        "vs-flashbang.minInterval": {
+          "type": "number",
+          "default": 5,
+          "description": "Minimum interval between flashes in minutes"
+        },
+        "vs-flashbang.maxInterval": {
+          "type": "number",
+          "default": 20,
+          "description": "Maximum interval between flashes in minutes"
+        },
+        "vs-flashbang.length": {
+          "type": "number",
+          "default": 2.5,
+          "description": "Length of flash in seconds"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "yarn run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "yarn run compile && yarn run lint",
+    "lint": "eslint src --ext ts",
+    "test": "vscode-test"
+  },
+  "devDependencies": {
+    "@types/mocha": "^10.0.6",
+    "@types/node": "18.x",
+    "@types/vscode": "^1.94.0",
+    "@typescript-eslint/eslint-plugin": "^6.13.1",
+    "@typescript-eslint/parser": "^6.13.1",
+    "@vscode/test-cli": "^0.0.4",
+    "@vscode/test-electron": "^2.3.8",
+    "eslint": "^8.54.0",
+    "typescript": "^5.3.2"
+  },
+  "dependencies": {
+    "play-sound": "^1.1.6",
+    "sound-play": "^1.1.0"
+  }
+}
