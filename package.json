@@ -2,7 +2,7 @@
   "name": "vs-flashbang",
   "displayName": "Flashbang",
   "description": "Randomly deploy a flashbang in your editor",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "repository": {
     "type": "git",
     "url": "https://github.com/NullSeile/vs-flashbang.git"
@@ -23,6 +23,18 @@
       {
         "command": "vs-flashbang.deploy",
         "title": "Deploy Flashbang"
+      },
+      {
+        "command": "vs-flashbang.register",
+        "title": "Flashbang: Register User"
+      },
+      {
+        "command": "vs-flashbang.login",
+        "title": "Flashbang: Login"
+      },
+      {
+        "command": "vs-flashbang.send",
+        "title": "Flashbang: Send"
       }
     ],
     "configuration": {
@@ -42,6 +54,16 @@
           "type": "number",
           "default": 2.5,
           "description": "Length of flash in seconds"
+        },
+        "vs-flashbang.username": {
+          "type": "string",
+          "default": "",
+          "description": "Username for flashbang service"
+        },
+        "vs-flashbang.apiUrl": {
+          "type": "string",
+          "default": "",
+          "description": "URL of flashbang service"
         }
       }
     }
@@ -66,6 +88,7 @@
     "typescript": "^5.3.2"
   },
   "dependencies": {
+    "axios": "^1.7.7",
     "play-sound": "^1.1.6",
     "sound-play": "^1.1.0"
   }
