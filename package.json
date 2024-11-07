@@ -2,7 +2,7 @@
   "name": "vs-flashbang",
   "displayName": "Flashbang",
   "description": "Randomly deploy a flashbang in your editor",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "repository": {
     "type": "git",
     "url": "https://github.com/NullSeile/vs-flashbang.git"
@@ -35,6 +35,10 @@
       {
         "command": "vs-flashbang.send",
         "title": "Flashbang: Send"
+      },
+      {
+        "command": "vs-flashbang.active-users",
+        "title": "Flashbang: Active Users"
       }
     ],
     "configuration": {

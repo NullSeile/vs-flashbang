@@ -15,7 +15,7 @@ async function deployFlashbang(context: vscode.ExtensionContext) {
 	await player.play(vscode.Uri.joinPath(context.extensionUri, 'flashbang-dummy.mp3').fsPath, 0.0);
 
 	await vscode.commands.executeCommand('workbench.action.toggleLightDarkThemes');
-	
+
 	await new Promise(resolve => setTimeout(resolve, length * 1000));
 
 	await vscode.commands.executeCommand('workbench.action.toggleLightDarkThemes');
@@ -38,20 +38,62 @@ async function f(context: vscode.ExtensionContext) {
 	}, getRandomInterval());
 }
 
+
+function sendFlashbang(username: string, message: string) {
+
+	const config = vscode.workspace.getConfiguration('vs-flashbang');
+	let sender = config.get<string>('username');
+	const apiUrl = config.get<string>('apiUrl');
+
+	if (!sender) {
+		vscode.window.showErrorMessage('You must be logged in to send a flashbang');
+		return;
+	}
+
+	message = encodeURIComponent(message!);
+	username = encodeURIComponent(username!);
+	sender = encodeURIComponent(sender!);
+
+	axios.get(`${apiUrl}/send?sender=${sender}&receiver=${username}&message=${message}`).then((response) => {
+		console.log(response.data);
+	}).catch((error) => {
+		console.error(error);
+		vscode.window.showErrorMessage(`Failed to send flashbang to ${username}: ${error}`);
+	});
+}
+
+class UserQuickPickItem implements vscode.QuickPickItem {
+	label: string;
+	description: string;
+	username: string;
+
+	constructor(username: string, displayname: string, active: boolean) {
+		this.username = username;
+		this.label = `${displayname} (${username})`;
+		this.description = active ? 'Active' : '';
+	}
+}
+
 export function activate(context: vscode.ExtensionContext) {
-	
 	context.subscriptions.push(vscode.commands.registerCommand('vs-flashbang.register', () => {
 		// Ask for username
 		vscode.window.showInputBox({
 			prompt: 'Enter your username',
 			placeHolder: 'Username'
 		}).then((username) => {
+			if (!username) {
+				return;
+			}
 			// Ask for display name
 			vscode.window.showInputBox({
 				prompt: 'Enter your display name',
 				placeHolder: 'Display name'
 			}).then((displayname) => {
-				
+				if (!displayname) {
+					vscode.window.showErrorMessage('Display name is required');
+					return;
+				}
+
 				const config = vscode.workspace.getConfiguration('vs-flashbang');
 				const apiUrl = config.get<string>('apiUrl');
 
@@ -72,6 +114,9 @@ export function activate(context: vscode.ExtensionContext) {
 			prompt: 'Enter your username',
 			placeHolder: 'Username'
 		}).then((username) => {
+			if (!username) {
+				return;
+			}
 			// Store the username
 			const config = vscode.workspace.getConfiguration('vs-flashbang');
 			config.update('username', username, vscode.ConfigurationTarget.Global);
@@ -84,32 +129,64 @@ export function activate(context: vscode.ExtensionContext) {
 			prompt: 'Enter the username of the recipient',
 			placeHolder: 'Username'
 		}).then((username) => {
+			if (!username) {
+				return;
+			}
 			// Ask for message
 			vscode.window.showInputBox({
 				prompt: 'Enter the message',
 				placeHolder: 'Message'
 			}).then((message) => {
-				// Send flashbang
-				const config = vscode.workspace.getConfiguration('vs-flashbang');
-				let sender = config.get<string>('username');
-				const apiUrl = config.get<string>('apiUrl');
+				if (!message) {
+					return;
+				}
+				sendFlashbang(username!, message!);
+			});
+		});
+	}));
 
-				if (!sender) {
-					vscode.window.showErrorMessage('You must be logged in to send a flashbang');
+	context.subscriptions.push(vscode.commands.registerCommand('vs-flashbang.active-users', () => {
+		const config = vscode.workspace.getConfiguration('vs-flashbang');
+		const apiUrl = config.get<string>('apiUrl');
+
+		axios.get(`${apiUrl}/get_users_active`).then((response) => {
+			console.log(response.data);
+			let users = response.data.users;
+
+			const items: UserQuickPickItem[] = users.sort((u1: any, u2: any) => {
+				// Sort by active status then by username
+				if (u1.active && !u2.active) {
+					return -1;
+				} else if (!u1.active && u2.active) {
+					return 1;
+				} else {
+					return u1.username.localeCompare(u2.username);
+				}
+			}).map((user: any) => {
+				return new UserQuickPickItem(user.username, user.displayname, user.active);
+			});
+
+			vscode.window.showQuickPick(items).then((selectedUser) => {
+				if (!selectedUser) {
 					return;
 				}
 
-				message = encodeURIComponent(message!);
-				username = encodeURIComponent(username!);
-				sender = encodeURIComponent(sender!);
+				const username = selectedUser.username;
 
-				axios.get(`${apiUrl}/send?sender=${sender}&receiver=${username}&message=${message}`).then((response) => {
-					console.log(response.data);
-				}).catch((error) => {
-					console.error(error);
-					vscode.window.showErrorMessage(`Failed to send flashbang to ${username}: ${error}`);
+				vscode.window.showInputBox({
+					prompt: 'Enter the message',
+					placeHolder: 'Message'
+				}).then((message) => {
+					if (!message) {
+						return;
+					}
+					sendFlashbang(username, message!);
 				});
 			});
+
+		}).catch((error) => {
+			console.error(error);
+			vscode.window.showErrorMessage(`Failed to get active users: ${error}`);
 		});
 	}));
 
@@ -143,4 +220,4 @@ export function activate(context: vscode.ExtensionContext) {
 	}, 2000);
 }
 
-export function deactivate() {}
+export function deactivate() { }
