@@ -1,13 +1,13 @@
 {
   "name": "vs-flashbang",
-  "displayName": "Flashbang",
+  "displayName": "Random Flashbang",
   "description": "Randomly deploy a flashbang in your editor",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "repository": {
     "type": "git",
     "url": "https://github.com/NullSeile/vs-flashbang.git"
   },
-  "publisher": "nullptr",
+  "publisher": "hollow-ptr",
   "engines": {
     "vscode": "^1.94.0"
   },
@@ -59,15 +59,25 @@
           "default": 2.5,
           "description": "Length of flash in seconds"
         },
+        "vs-flashbang.apiUrl": {
+          "type": "string",
+          "default": "",
+          "description": "URL of flashbang service"
+        },
         "vs-flashbang.username": {
           "type": "string",
           "default": "",
           "description": "Username for flashbang service"
         },
-        "vs-flashbang.apiUrl": {
-          "type": "string",
-          "default": "",
-          "description": "URL of flashbang service"
+        "vs-flashbang.recieveWhenUnfocused": {
+          "type": "boolean",
+          "default": false,
+          "description": "Recieve flashes when editor is not focused"
+        },
+        "vs-flashbang.recieveWhenNotActive": {
+          "type": "boolean",
+          "default": true,
+          "description": "Recieve flashes when window is not active"
         }
       }
     }

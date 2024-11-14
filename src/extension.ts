@@ -32,7 +32,10 @@ function getRandomInterval() {
 }
 
 async function f(context: vscode.ExtensionContext) {
-	await deployFlashbang(context);
+	if (vscode.window.state.focused) {
+		await deployFlashbang(context);
+	}
+
 	setTimeout(() => {
 		f(context);
 	}, getRandomInterval());
@@ -200,6 +203,17 @@ export function activate(context: vscode.ExtensionContext) {
 
 	setInterval(async () => {
 		const config = vscode.workspace.getConfiguration('vs-flashbang');
+
+		const recieveWhenUnfocused = config.get<boolean>('recieveWhenUnfocused');
+		if (!recieveWhenUnfocused && !vscode.window.state.focused) {
+			return;
+		}
+		
+		const recieveWhenNotActive = config.get<boolean>('recieveWhenNotActive');
+		if (!recieveWhenNotActive && !vscode.window.state.active) {
+			return;
+		}
+
 		const username = config.get<string>('username');
 		const apiUrl = config.get<string>('apiUrl');
 
@@ -208,7 +222,6 @@ export function activate(context: vscode.ExtensionContext) {
 		}
 
 		const result = await axios.get(`${apiUrl}/get_unread?username=${username}`);
-		console.log(result.data);
 		const messages = result.data.messages;
 		for (const flashbang of messages) {
 			console.log(flashbang);
